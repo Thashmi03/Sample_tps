@@ -18,7 +18,10 @@ var (
 	collection *mongo.Collection
 	mu         sync.Mutex // Mutex for protecting shared resources
 )
-
+type Data struct {
+	Name string`json:"name" bson:"name"`
+	Id int32 `json:"id" bson:"id"`
+}
 func init() {
 	// Connect to MongoDB
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/?retryWrites=true&serverSelectionTimeoutMS=5000&connectTimeoutMS=10000")
@@ -32,7 +35,7 @@ func init() {
 
 	// Access the database and collection
 	database := client.Database("db")        // Replace "mydb" with your database name
-	collection = database.Collection("tokens") // Replace "tokens" with your collection name
+	collection = database.Collection("data") // Replace "tokens" with your collection name
 }
 func Test(c *gin.Context) {
 	var requestBody map[string]interface{}
@@ -50,14 +53,17 @@ func Test(c *gin.Context) {
 }
 func Token(c *gin.Context) {
 	token := c.GetHeader("Authorization")
-	
+	data:=Data{
+		Name:"thash",
+		Id: 18,
+	}
 	if token == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token not found in the header"})
 		return
 	}
 
 	// Store the token in MongoDB
-	_, err := collection.InsertOne(context.TODO(), map[string]interface{}{"token": token})
+	_, err := collection.InsertOne(context.TODO(), map[string]interface{}{"token": token,"data":data})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
