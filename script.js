@@ -2,18 +2,18 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 export const options = {
   vus:1,
-  iterations :100000
+  iterations :10
 }
 export default function () {
   // // http.post('http://localhost:4000/test');
   // // Define the API endpoint
   // // const url = 'http://localhost:4000/test';
-  const url = 'http://localhost:4000/test'
+  const url = 'http://localhost:4000/tokens'
   // // Define the JSON request body
-  const payload = JSON.stringify({
-    "name": "thash",
-    // "id":18
-  });
+  const payload = JSON.stringify([{
+    name: "thash",
+    id:18
+  },{name:"swetha",id:44}]);
   // const jsonData = '{"name":"thash","id":318}';
 
   // Make an HTTP POST request with the JSON payload

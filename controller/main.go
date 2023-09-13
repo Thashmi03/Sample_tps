@@ -35,7 +35,7 @@ func init() {
 
 	// Access the database and collection
 	database := client.Database("db")        // Replace "mydb" with your database name
-	collection = database.Collection("data") // Replace "tokens" with your collection name
+	collection = database.Collection("sample") // Replace "tokens" with your collection name
 }
 func Test(c *gin.Context) {
 	var requestBody map[string]interface{}
@@ -53,17 +53,22 @@ func Test(c *gin.Context) {
 }
 func Token(c *gin.Context) {
 	token := c.GetHeader("Authorization")
-	data:=Data{
-		Name:"thash",
-		Id: 18,
-	}
+	var data []Data
 	if token == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Token not found in the header"})
 		return
 	}
+	if err := c.ShouldBindJSON(&data); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
+	insertData := make([]interface{}, len(data))
+    for i, doc := range data {
 
+        insertData[i] = doc
+    }
 	// Store the token in MongoDB
-	_, err := collection.InsertOne(context.TODO(), map[string]interface{}{"token": token,"data":data})
+	_, err := collection.InsertOne(context.TODO(), map[string]interface{}{"token": token,"details":insertData})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
